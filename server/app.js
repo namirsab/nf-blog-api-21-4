@@ -24,6 +24,17 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/articles", (req, res) => {
+  db.findAll()
+    .then((articles) => {
+      res.send(articles);
+    })
+    .catch((error) => {
+      res.status(500);
+      res.send("Something went wrong, please try again later");
+    });
+});
+
 /*
   We have to start the server. We make it listen on the port 4000
 
