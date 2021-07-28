@@ -29,9 +29,11 @@ app.get("/articles", (req, res) => {
     .then((articles) => {
       res.send(articles);
     })
-    .catch((error) => {
+    .catch(() => {
       res.status(500);
-      res.send("Something went wrong, please try again later");
+      res.json({
+        error: "Something went wrong, please try again later",
+      });
     });
 });
 
@@ -41,9 +43,28 @@ app.post("/articles", (req, res) => {
     .then((newArticle) => {
       res.status(201).send(newArticle);
     })
-    .catch((error) => {
+    .catch(() => {
       res.status(500);
-      res.send("Something went wrong, please try again later");
+      res.json({
+        error: "Something went wrong, please try again later",
+      });
+    });
+});
+
+app.get("/articles/:id", (req, res) => {
+  const { id } = req.params;
+  db.findById(id)
+    .then((article) => {
+      if (!article) {
+        res.status(404).end();
+      }
+      res.send(article);
+    })
+    .catch(() => {
+      res.status(500);
+      res.json({
+        error: "Something went wrong, please try again later",
+      });
     });
 });
 
