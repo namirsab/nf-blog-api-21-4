@@ -35,6 +35,18 @@ app.get("/articles", (req, res) => {
     });
 });
 
+app.post("/articles", (req, res) => {
+  // Validation is missing still
+  db.insert(req.body)
+    .then((newArticle) => {
+      res.status(201).send(newArticle);
+    })
+    .catch((error) => {
+      res.status(500);
+      res.send("Something went wrong, please try again later");
+    });
+});
+
 /*
   We have to start the server. We make it listen on the port 4000
 
