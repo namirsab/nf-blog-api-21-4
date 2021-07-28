@@ -11,6 +11,8 @@ const app = express();
   We setup middleware to:
   - parse the body of the request to json for us
   https://expressjs.com/en/guide/using-middleware.html
+
+  Application Level Middleware
 */
 app.use(express.json());
 app.use(function logRequests(req, res, next) {
@@ -42,8 +44,24 @@ app.get("/articles", (req, res) => {
     });
 });
 
-app.post("/articles", (req, res) => {
-  // Validation is missing still
+function validateRequest(req, res, next) {
+  if (!req.body.title) {
+    res.status(400).json({
+      error: "Request body must contain a title property",
+    });
+    return;
+  }
+  if (!req.body.body) {
+    res.status(400).json({
+      error: "Request body must contain a body property",
+    });
+    return;
+  }
+
+  next();
+}
+
+app.post("/articles", validateRequest, (req, res) => {
   db.insert(req.body)
     .then((newArticle) => {
       res.status(201).send(newArticle);
