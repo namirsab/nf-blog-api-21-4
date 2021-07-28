@@ -57,8 +57,28 @@ app.get("/articles/:id", (req, res) => {
     .then((article) => {
       if (!article) {
         res.status(404).end();
+        return;
       }
       res.send(article);
+    })
+    .catch(() => {
+      res.status(500);
+      res.json({
+        error: "Something went wrong, please try again later",
+      });
+    });
+});
+
+app.patch("/articles/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.updateById(id, req.body)
+    .then((updatedPost) => {
+      if (!updatedPost) {
+        res.status(404).end();
+        return;
+      }
+      res.send(updatedPost);
     })
     .catch(() => {
       res.status(500);
