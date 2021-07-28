@@ -1,5 +1,6 @@
 const express = require("express");
 const db = require("./lib/db");
+const cors = require("cors");
 
 /*
   We create an express app calling
@@ -14,6 +15,8 @@ const app = express();
 
   Application Level Middleware
 */
+
+app.use(cors());
 app.use(express.json());
 app.use(function logRequests(req, res, next) {
   console.log(new Date().toString());
