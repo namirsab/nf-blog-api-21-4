@@ -30,3 +30,6 @@ Content-Type: application/json
 {
   "title": "Changed Title"
 }
+
+### DELETE article by id
+DELETE  http://localhost:4000/articles/10 HTTP/1.1

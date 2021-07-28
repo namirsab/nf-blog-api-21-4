@@ -88,6 +88,21 @@ app.patch("/articles/:id", (req, res) => {
     });
 });
 
+app.delete("/articles/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.deleteById(id)
+    .then(() => {
+      res.status(204).end();
+    })
+    .catch(() => {
+      res.status(500);
+      res.json({
+        error: "Something went wrong, please try again later",
+      });
+    });
+});
+
 /*
   We have to start the server. We make it listen on the port 4000
 
