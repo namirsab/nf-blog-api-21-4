@@ -13,6 +13,11 @@ const app = express();
   https://expressjs.com/en/guide/using-middleware.html
 */
 app.use(express.json());
+app.use(function logRequests(req, res, next) {
+  console.log(new Date().toString());
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 /*
   Endpoint to handle GET requests to the root URI "/"
