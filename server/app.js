@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("./lib/db");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 /*
   We create an express app calling
@@ -130,9 +131,20 @@ app.delete("/articles/:id", (req, res) => {
 });
 
 /*
-  We have to start the server. We make it listen on the port 4000
-
+  We connect to MongoDB and when the connection is successful
+  put our express app to listen in port 4000
 */
-app.listen(4000, () => {
-  console.log("Listening on http://localhost:4000");
-});
+mongoose
+  .connect("mongodb://localhost:27017/articles-api", {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    console.log("Connected to mongo");
+    app.listen(4000, () => {
+      console.log("Listening on http://localhost:4000");
+    });
+  })
+  .catch((error) => {
+    console.error(error);
+  });
