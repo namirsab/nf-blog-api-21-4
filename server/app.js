@@ -1,7 +1,7 @@
 const express = require("express");
-const db = require("./lib/db");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const Article = require("./models/article");
 
 /*
   We create an express app calling
@@ -35,19 +35,6 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/articles", (req, res) => {
-  db.findAll()
-    .then((articles) => {
-      res.send(articles);
-    })
-    .catch(() => {
-      res.status(500);
-      res.json({
-        error: "Something went wrong, please try again later",
-      });
-    });
-});
-
 function validateRequest(req, res, next) {
   if (!req.body.title) {
     res.status(400).json({
@@ -65,10 +52,10 @@ function validateRequest(req, res, next) {
   next();
 }
 
-app.post("/articles", validateRequest, (req, res) => {
-  db.insert(req.body)
-    .then((newArticle) => {
-      res.status(201).send(newArticle);
+app.get("/articles", (req, res) => {
+  Article.find({})
+    .then((articles) => {
+      res.send(articles);
     })
     .catch(() => {
       res.status(500);
@@ -78,9 +65,24 @@ app.post("/articles", validateRequest, (req, res) => {
     });
 });
 
+app.post("/articles", validateRequest, (req, res) => {
+  Article.create(req.body)
+    .then((newArticle) => {
+      res.status(201).send(newArticle);
+    })
+    .catch((error) => {
+      if (error.name === "ValidationError") {
+        console.error(error);
+        res.status(400);
+        res.json(error);
+      }
+    });
+});
+
 app.get("/articles/:id", (req, res) => {
   const { id } = req.params;
-  db.findById(id)
+
+  Article.findById(id)
     .then((article) => {
       if (!article) {
         res.status(404).end();
@@ -99,7 +101,7 @@ app.get("/articles/:id", (req, res) => {
 app.patch("/articles/:id", (req, res) => {
   const { id } = req.params;
 
-  db.updateById(id, req.body)
+  Article.findByIdAndUpdate(id, req.body, { new: true })
     .then((updatedPost) => {
       if (!updatedPost) {
         res.status(404).end();
@@ -118,7 +120,7 @@ app.patch("/articles/:id", (req, res) => {
 app.delete("/articles/:id", (req, res) => {
   const { id } = req.params;
 
-  db.deleteById(id)
+  Article.findByIdAndDelete(id)
     .then(() => {
       res.status(204).end();
     })
@@ -134,10 +136,12 @@ app.delete("/articles/:id", (req, res) => {
   We connect to MongoDB and when the connection is successful
   put our express app to listen in port 4000
 */
+
 mongoose
   .connect("mongodb://localhost:27017/articles-api", {
     useUnifiedTopology: true,
     useNewUrlParser: true,
+    useFindAndModify: false,
   })
   .then(() => {
     console.log("Connected to mongo");
