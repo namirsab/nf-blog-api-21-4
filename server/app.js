@@ -83,6 +83,7 @@ app.get("/articles/:id", (req, res) => {
   const { id } = req.params;
 
   Article.findById(id)
+    .populate("author")
     .then((article) => {
       if (!article) {
         res.status(404).end();
@@ -102,6 +103,7 @@ app.patch("/articles/:id", (req, res) => {
   const { id } = req.params;
 
   Article.findByIdAndUpdate(id, req.body, { new: true })
+    .populate("author")
     .then((updatedPost) => {
       if (!updatedPost) {
         res.status(404).end();
