@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const Article = require("./models/article");
+const Author = require("./models/Author");
 
 /*
   We create an express app calling
@@ -54,6 +55,7 @@ function validateRequest(req, res, next) {
 
 app.get("/articles", (req, res) => {
   Article.find({})
+    .populate("author")
     .then((articles) => {
       res.send(articles);
     })
@@ -72,9 +74,7 @@ app.post("/articles", validateRequest, (req, res) => {
     })
     .catch((error) => {
       if (error.name === "ValidationError") {
-        console.error(error);
-        res.status(400);
-        res.json(error);
+        res.status(400).json(error);
       }
     });
 });
@@ -123,6 +123,32 @@ app.delete("/articles/:id", (req, res) => {
   Article.findByIdAndDelete(id)
     .then(() => {
       res.status(204).end();
+    })
+    .catch(() => {
+      res.status(500);
+      res.json({
+        error: "Something went wrong, please try again later",
+      });
+    });
+});
+
+app.get("/authors", (req, res) => {
+  Author.find({})
+    .then((authors) => {
+      res.send(authors);
+    })
+    .catch(() => {
+      res.status(500);
+      res.json({
+        error: "Something went wrong, please try again later",
+      });
+    });
+});
+
+app.post("/authors", (req, res) => {
+  Author.create(req.body)
+    .then((newAuthor) => {
+      res.send(newAuthor);
     })
     .catch(() => {
       res.status(500);

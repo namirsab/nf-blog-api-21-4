@@ -42,4 +42,4 @@ Content-Type: application/json
 }
 
 ### DELETE article by id
-DELETE  http://localhost:4000/articles/10 HTTP/1.1
+DELETE  http://localhost:4000/articles/6102b2c90eb8d80db8d4ad30 HTTP/1.1
