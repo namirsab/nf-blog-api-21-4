@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const Article = require("./models/article");
-const Author = require("./models/Author");
+const articlesRouter = require("./routes/articles");
+const authorsRouter = require("./routes/authors");
 
 /*
   We create an express app calling
@@ -33,132 +33,12 @@ app.get("/", (req, res) => {
   res.json({
     "/articles": "read and create new articles",
     "/articles/:id": "read, update and delete an individual article",
+    "/auhors": "read and create new authors",
   });
 });
 
-function validateRequest(req, res, next) {
-  if (!req.body.title) {
-    res.status(400).json({
-      error: "Request body must contain a title property",
-    });
-    return;
-  }
-  if (!req.body.body) {
-    res.status(400).json({
-      error: "Request body must contain a body property",
-    });
-    return;
-  }
-
-  next();
-}
-
-app.get("/articles", (req, res) => {
-  Article.find({})
-    .populate("author")
-    .then((articles) => {
-      res.send(articles);
-    })
-    .catch(() => {
-      res.status(500);
-      res.json({
-        error: "Something went wrong, please try again later",
-      });
-    });
-});
-
-app.post("/articles", validateRequest, (req, res) => {
-  Article.create(req.body)
-    .then((newArticle) => {
-      res.status(201).send(newArticle);
-    })
-    .catch((error) => {
-      if (error.name === "ValidationError") {
-        res.status(400).json(error);
-      }
-    });
-});
-
-app.get("/articles/:id", (req, res) => {
-  const { id } = req.params;
-
-  Article.findById(id)
-    .populate("author")
-    .then((article) => {
-      if (!article) {
-        res.status(404).end();
-        return;
-      }
-      res.send(article);
-    })
-    .catch(() => {
-      res.status(500);
-      res.json({
-        error: "Something went wrong, please try again later",
-      });
-    });
-});
-
-app.patch("/articles/:id", (req, res) => {
-  const { id } = req.params;
-
-  Article.findByIdAndUpdate(id, req.body, { new: true })
-    .populate("author")
-    .then((updatedPost) => {
-      if (!updatedPost) {
-        res.status(404).end();
-        return;
-      }
-      res.send(updatedPost);
-    })
-    .catch(() => {
-      res.status(500);
-      res.json({
-        error: "Something went wrong, please try again later",
-      });
-    });
-});
-
-app.delete("/articles/:id", (req, res) => {
-  const { id } = req.params;
-
-  Article.findByIdAndDelete(id)
-    .then(() => {
-      res.status(204).end();
-    })
-    .catch(() => {
-      res.status(500);
-      res.json({
-        error: "Something went wrong, please try again later",
-      });
-    });
-});
-
-app.get("/authors", (req, res) => {
-  Author.find({})
-    .then((authors) => {
-      res.send(authors);
-    })
-    .catch(() => {
-      res.status(500);
-      res.json({
-        error: "Something went wrong, please try again later",
-      });
-    });
-});
-
-app.post("/authors", (req, res) => {
-  Author.create(req.body)
-    .then((newAuthor) => {
-      res.send(newAuthor);
-    })
-    .catch(() => {
-      res.status(500);
-      res.json({
-        error: "Something went wrong, please try again later",
-      });
-    });
-});
+app.use("/articles", articlesRouter);
+app.use("/authors", authorsRouter);
 
 /*
   We connect to MongoDB and when the connection is successful
