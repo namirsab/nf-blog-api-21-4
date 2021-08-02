@@ -47,7 +47,7 @@ app.use("/authors", authorsRouter);
 */
 
 const { MONGO_URI, PORT } = process.env;
-
+console.log("Connecting to mongo now");
 mongoose
   .connect(MONGO_URI, {
     useUnifiedTopology: true,
