@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -45,15 +46,17 @@ app.use("/authors", authorsRouter);
   put our express app to listen in port 4000
 */
 
+const { MONGO_URI, PORT } = process.env;
+
 mongoose
-  .connect("mongodb://localhost:27017/articles-api", {
+  .connect(MONGO_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useFindAndModify: false,
   })
   .then(() => {
     console.log("Connected to mongo");
-    app.listen(4000, () => {
+    app.listen(PORT, () => {
       console.log("Listening on http://localhost:4000");
     });
   })
