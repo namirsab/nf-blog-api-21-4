@@ -46,7 +46,7 @@ app.use("/authors", authorsRouter);
   put our express app to listen in port 4000
 */
 
-const { MONGO_URI } = process.env;
+const { MONGO_URI, PORT } = process.env;
 
 mongoose
   .connect(MONGO_URI, {
@@ -56,8 +56,8 @@ mongoose
   })
   .then(() => {
     console.log("Connected to mongo");
-    app.listen(4000, () => {
-      console.log("Listening on http://localhost:4000");
+    app.listen(PORT, () => {
+      console.log(`Listening on port ${PORT}`);
     });
   })
   .catch((error) => {
