@@ -3,16 +3,22 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "nodemon server/app.js"
+    "start": "node server/app.js",
+    "dev": "nodemon server/app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^7.31.0",
+    "eslint-plugin-import": "^2.23.4",
     "nodemon": "^2.0.7",
     "prettier": "2.2.1"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.13.4"
   }
 }

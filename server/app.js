@@ -1,5 +1,9 @@
+require("dotenv").config();
 const express = require("express");
-const db = require("./lib/db");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const articlesRouter = require("./routes/articles");
+const authorsRouter = require("./routes/authors");
 
 /*
   We create an express app calling
@@ -11,8 +15,17 @@ const app = express();
   We setup middleware to:
   - parse the body of the request to json for us
   https://expressjs.com/en/guide/using-middleware.html
+
+  Application Level Middleware
 */
+
+app.use(cors());
 app.use(express.json());
+app.use(function logRequests(req, res, next) {
+  console.log(new Date().toString());
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 /*
   Endpoint to handle GET requests to the root URI "/"
@@ -21,13 +34,32 @@ app.get("/", (req, res) => {
   res.json({
     "/articles": "read and create new articles",
     "/articles/:id": "read, update and delete an individual article",
+    "/auhors": "read and create new authors",
   });
 });
 
-/*
-  We have to start the server. We make it listen on the port 4000
+app.use("/articles", articlesRouter);
+app.use("/authors", authorsRouter);
 
+/*
+  We connect to MongoDB and when the connection is successful
+  put our express app to listen in port 4000
 */
-app.listen(4000, () => {
-  console.log("Listening on http://localhost:4000");
-});
+
+const { MONGO_URI, PORT } = process.env;
+
+mongoose
+  .connect(MONGO_URI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useFindAndModify: false,
+  })
+  .then(() => {
+    console.log("Connected to mongo");
+    app.listen(PORT, () => {
+      console.log(`Listening on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error(error);
+  });
